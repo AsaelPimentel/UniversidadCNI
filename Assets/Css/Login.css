@@ -1,0 +1,162 @@
+/* Variables de Identidad Gráfica UABC */
+:root {
+    --uabc-green: #00723F;
+    --uabc-green-dark: #004d2a;
+    --uabc-gold: #F0B323;
+    --uabc-gold-hover: #d99f1b;
+}
+
+body.login-page {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, rgba(240, 244, 243, 0.8) 0%, rgba(216, 226, 223, 0.8) 100%), 
+                url("../Img/FondoCimarron.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 950px;
+    padding: 20px;
+}
+
+.login-card {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* --- LADO IZQUIERDO (VERDE) --- */
+.brand-side {
+    background-color: var(--uabc-green);
+    position: relative;
+    overflow: hidden;
+    padding: 60px 40px !important; /* Ajuste de padding para equilibrio visual */
+}
+
+/* Contenedor circular (ahora para el Logo CNI) */
+.logo-container {
+    background: #ffffff;
+    border-radius: 50%;
+    width: 140px; /* Un poco más grande para el CNI */
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px; 
+    z-index: 1;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Logo CNI central (se mantiene en su color original) */
+.cni-logo-main {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Contenedor alineado para UABC + Nombre (tipo tabla) */
+.uabc-inline-container {
+    width: 100%;
+    max-width: 380px; /* Limita el ancho para que el texto no se extienda mucho */
+    z-index: 1;
+}
+
+/* Escudo UABC pequeño al costado del nombre */
+.uabc-logo-small {
+    width: 35px; /* Tamaño discreto al costado del texto */
+    height: auto;
+
+}
+
+.institution-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: left; /* Alineación a la izquierda para el nombre */
+    flex: 1; /* Ocupa el espacio restante */
+}
+
+.faculty-name {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    z-index: 1;
+    margin-top: 10px;
+}
+
+.brand-divider {
+    border-top: 3px solid var(--uabc-gold);
+    opacity: 1;
+    width: 50px;
+}
+
+.motto {
+    font-family: 'Playfair Display', serif;
+    color: var(--uabc-gold);
+    z-index: 1;
+}
+
+/* --- LADO DERECHO (FORMULARIO) --- */
+.form-side {
+    background-color: #ffffff;
+}
+
+.custom-form-floating .form-control {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    height: calc(3.8rem + 2px);
+    padding-left: 3.5rem !important;
+    font-weight: 600;
+}
+
+.custom-form-floating label {
+    padding-left: 3.5rem !important;
+    color: #a0aab5;
+}
+
+.custom-form-floating .form-control:focus {
+    border-color: var(--uabc-green);
+    box-shadow: 0 0 0 0.25rem rgba(0, 114, 63, 0.15);
+}
+
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 1.2rem;
+    transform: translateY(-50%);
+    color: #cbd3da;
+    font-size: 1.2rem;
+    z-index: 10;
+}
+
+.custom-form-floating .form-control:focus ~ .input-icon,
+.custom-form-floating .form-control:not(:placeholder-shown) ~ .input-icon {
+    color: var(--uabc-green);
+}
+
+.btn-uabc-gold {
+    background-color: var(--uabc-gold);
+    color: #fff;
+    border-radius: 12px;
+}
+
+.btn-uabc-gold:hover {
+    background-color: var(--uabc-gold-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(240, 179, 35, 0.3) !important;
+}
+
+@media (max-width: 768px) {
+    .brand-side { padding: 40px 20px !important; }
+    .uabc-inline-container { flex-direction: column; text-align: center; }
+    .uabc-logo-small { margin-right: 0 !important; margin-bottom: 10px; }
+    .institution-name { text-align: center; }
+}
