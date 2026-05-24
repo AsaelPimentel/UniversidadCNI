@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Config/Conexion.php';
+require_once __DIR__ . '/NotificacionModel.php';
 class TareaModel
 {
     private $db;
@@ -60,7 +61,24 @@ class TareaModel
         $texto = mysqli_real_escape_string($this->db, $comentario);
 
         $sql = "INSERT INTO comentarios_tarea (tarea_id, usuario_id, comentario) VALUES ('$tarea', '$usuario', '$texto')";
-        return mysqli_query($this->db, $sql);
+        $ejecutado = mysqli_query($this->db, $sql);
+
+        if ($ejecutado) {
+            // BUSCAR AL ALUMNO DE LA TAREA para notificarle
+            $sql_alumno = "SELECT t.usuario_id, l.curso_id, l.id as leccion_id 
+                           FROM tareas_entregadas t
+                           JOIN lecciones l ON t.leccion_id = l.id 
+                           WHERE t.id = '$tarea'";
+            $res = mysqli_fetch_assoc(mysqli_query($this->db, $sql_alumno));
+
+            if ($res) {
+                // Crear la notificación para el alumno
+                $notif = new NotificacionModel();
+                $notif->crearNotificacion($res['usuario_id'], "El instructor ha dejado un comentario en tu tarea.", $res['leccion_id'], $res['curso_id']);
+            }
+        }
+
+        return $ejecutado;
     }
 
     public function obtenerComentariosPrivados($tarea_id)
