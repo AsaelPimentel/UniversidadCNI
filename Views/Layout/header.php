@@ -166,6 +166,9 @@ $current_a = isset($_GET['a']) ? strtolower(trim($_GET['a'])) : 'login';
 
                         <?php if (isset($_SESSION['usuario_id'])): ?>
                             <div class="d-flex align-items-center">
+
+                                <img src="assets/Img/ALUMNOS.png" alt="Avatar Usuario" class="rounded-circle me-2 bg-light shadow-sm" style="width: 45px; height: 45px; object-fit: contain; padding: 2px;">
+
                                 <div class="text-white me-3 text-end d-none d-sm-block">
                                     <span class="fw-bold d-block"><?php echo htmlspecialchars($_SESSION['nombre']); ?></span>
                                     <span class="badge bg-warning text-dark text-uppercase" style="font-size: 0.7rem;"><?php echo htmlspecialchars($_SESSION['role'] ?? $_SESSION['rol']); ?></span>

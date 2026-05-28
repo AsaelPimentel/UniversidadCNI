@@ -97,22 +97,65 @@ public function editar()
         require_once __DIR__ . '/../Models/EstadisticaModel.php';
         $model = new EstadisticaModel();
 
-        // Obtenemos los KPIs desde la base de datos
+        // 1. KPIs Globales
         $total_usuarios = $model->getTotalUsuarios();
         $total_cursos = $model->getTotalCursos();
         $total_certificados = $model->getTotalCertificados();
-
-        // AGREGAR ESTA LÍNEA:
         $info_sistema = $model->getInfoSistema();
 
-        // Obtenemos los datos para la gráfica de Chart.js
+        // 2. Gráfica Doughnut (Roles)
         $res_roles = $model->getUsuariosPorRol();
         $labels_roles = [];
         $data_roles = [];
-
         while ($row = mysqli_fetch_assoc($res_roles)) {
             $labels_roles[] = ucfirst($row['rol']);
             $data_roles[] = $row['cantidad'];
+        }
+
+        // ==========================================
+        // 3. LÓGICA DE FILTRO DE FECHAS (Para los nuevos gráficos)
+        // ==========================================
+        $rango = isset($_GET['rango']) ? $_GET['rango'] : '6m';
+
+        if ($rango === '7d') {
+            $formato_fecha = "'%Y-%m-%d'"; // Agrupar por DÍA
+            $limite_linea = 7;
+            $limite_barras = 7;
+        } elseif ($rango === '1m') {
+            $formato_fecha = "'%Y-%m-%d'"; // Agrupar por DÍA
+            $limite_linea = 30;
+            $limite_barras = 15; // Limitado visualmente
+        } elseif ($rango === '1y') {
+            $formato_fecha = "'%Y-%m'";    // Agrupar por MES
+            $limite_linea = 12;
+            $limite_barras = 30;
+        } else {
+            // Por defecto: 6 Meses ('6m')
+            $formato_fecha = "'%Y-%m'";    // Agrupar por MES
+            $limite_linea = 6;
+            $limite_barras = 14;
+        }
+
+        // Obtener datos para la gráfica de línea (Nuevos Usuarios)
+        $res_usu_mes = $model->getNuevosUsuariosPorRango($formato_fecha, $limite_linea);
+        $labels_meses = [];
+        $data_usuarios = [];
+        while ($row = mysqli_fetch_assoc($res_usu_mes)) {
+            $labels_meses[] = $row['periodo'];
+            $data_usuarios[] = $row['total'];
+        }
+
+        // Obtener datos para la gráfica de barras apiladas (Actividad)
+        $actividad_fechas = $model->getActividadDiariaPorRango($limite_barras);
+        
+        $labels_actividad = array_keys($actividad_fechas);
+        $data_lec = [];
+        $data_tar = [];
+        $data_com = [];
+        foreach ($actividad_fechas as $fecha => $datos) {
+            $data_lec[] = $datos['lecciones'];
+            $data_tar[] = $datos['tareas'];
+            $data_com[] = $datos['comentarios'];
         }
 
         // Cargamos las vistas inyectando las variables

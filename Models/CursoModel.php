@@ -10,15 +10,24 @@ class CursoModel {
     public function guardar($datos, $archivo, $instructor_id) {
         $titulo = mysqli_real_escape_string($this->db, $datos['titulo']);
         $desc   = mysqli_real_escape_string($this->db, $datos['descripcion']);
-        $ruta_db = "assets/img/default.jpg";
+        
+        // La imagen por defecto la seguimos dejando en tu carpeta img normal
+        $ruta_db = "Assets/Img/default.jpg";
+
+        // 1. Validar y crear la carpeta de Caratulas si no existe
+        if (!is_dir('Assets/Caratulas/')) {
+            mkdir('Assets/Caratulas/', 0777, true);
+        }
 
         if (isset($archivo['imagen_curso']) && $archivo['imagen_curso']['error'] == 0) {
             $extension = pathinfo($archivo['imagen_curso']['name'], PATHINFO_EXTENSION);
             $nombre_archivo = "curso_" . time() . "." . $extension;
-            $ruta_destino = "assets/img/" . $nombre_archivo; // Ruta relativa al index.php
+            
+            // 2. Guardamos físicamente en la nueva carpeta
+            $ruta_destino = "Assets/Caratulas/" . $nombre_archivo; // Ruta relativa al index.php
 
             if (move_uploaded_file($archivo['imagen_curso']['tmp_name'], $ruta_destino)) {
-                $ruta_db = "assets/img/" . $nombre_archivo;
+                $ruta_db = "Assets/Caratulas/" . $nombre_archivo;
             }
         }
 
@@ -32,7 +41,8 @@ class CursoModel {
 
         $query_img = mysqli_query($this->db, "SELECT imagen FROM cursos WHERE id = '$id_curso' AND instructor_id = '$instructor_id'");
         if ($row = mysqli_fetch_assoc($query_img)) {
-            if (!empty($row['imagen']) && $row['imagen'] != 'assets/img/default.jpg' && file_exists($row['imagen'])) {
+            // 3. Usamos stripos para que ignore borrar el archivo default sin importar si está en la carpeta vieja o nueva
+            if (!empty($row['imagen']) && stripos($row['imagen'], 'default.jpg') === false && file_exists($row['imagen'])) {
                 unlink($row['imagen']);
             }
         }
