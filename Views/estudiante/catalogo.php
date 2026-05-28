@@ -50,3 +50,43 @@
         transition: all .3s ease-in-out;
     }
 </style>
+
+<?php if (isset($_GET['msj']) && $_GET['msj'] == 'pass_ok'): ?>
+    <div class="modal fade" id="modalContrasenaExito" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-check-circle me-2"></i> ¡Actualización Exitosa!
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-key fa-4x text-success p-3 rounded-circle bg-light"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Tu contraseña ha sido actualizada</h5>
+                    <p class="text-muted small mb-0">Los cambios se guardaron correctamente en tu cuenta de acceso institucional.</p>
+                </div>
+                <div class="modal-footer bg-light border-0 py-2 justify-content-center">
+                    <button type="button" class="btn btn-success fw-bold px-4 btn-sm shadow-sm" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        window.onload = function() {
+            // Aseguramos que Bootstrap ya esté cargado desde el footer
+            setTimeout(function() {
+                if (typeof bootstrap !== 'undefined') {
+                    var elementoModal = document.getElementById('modalContrasenaExito');
+                    var modalBootstrap = new bootstrap.Modal(elementoModal);
+                    modalBootstrap.show();
+                } else {
+                    console.error("Bootstrap no se cargó a tiempo.");
+                }
+            }, 300); // Pequeño retraso de 300 milisegundos
+        };
+    </script>
+<?php endif; ?>

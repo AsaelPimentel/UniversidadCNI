@@ -4,6 +4,7 @@ require_once __DIR__ . '/../Models/LeccionModel.php';
 require_once __DIR__ . '/../Models/TareaModel.php';
 require_once __DIR__ . '/../Models/ProgresoModel.php';
 require_once __DIR__ . '/../Models/ForoModel.php';
+require_once __DIR__ . '/../Models/UsuarioModel.php';
 
 class EstudianteController
 {
@@ -146,6 +147,33 @@ class EstudianteController
             $model = new TareaModel();
             $model->guardarComentarioPrivado($_POST['tarea_id'], $_SESSION['usuario_id'], $_POST['comentario']);
             header("Location: index.php?c=estudiante&a=verCurso&id=" . $_POST['curso_id'] . "&lec_id=" . $_POST['leccion_id']);
+            exit();
+        }
+    }
+
+    public function miPerfil()
+    {
+        $modelUsuario = new UsuarioModel();
+        $user = $modelUsuario->obtenerPorId($_SESSION['usuario_id']);
+
+        require_once __DIR__ . '/../Views/Layout/header.php';
+        require_once __DIR__ . '/../Views/estudiante/perfil.php';
+        require_once __DIR__ . '/../Views/Layout/footer.php';
+    }
+
+public function actualizarContrasena()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $modelUsuario = new UsuarioModel();
+            $resultado = $modelUsuario->actualizarContrasena($_SESSION['usuario_id'], $_POST['password']);
+            
+            if ($resultado) {
+                // Redirecciona al catálogo principal con el parámetro de éxito
+                header("Location: index.php?c=estudiante&a=index&msj=pass_ok");
+            } else {
+                $_SESSION['alerta'] = ['tipo' => 'danger', 'mensaje' => 'Hubo un error al intentar actualizar tu contraseña.'];
+                header("Location: index.php?c=estudiante&a=miPerfil");
+            }
             exit();
         }
     }

@@ -118,6 +118,11 @@ $current_a = isset($_GET['a']) ? strtolower(trim($_GET['a'])) : 'login';
                                             <i class="fas fa-chart-line me-1"></i> Mi Progreso
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo ($current_c == 'estudiante' && $current_a == 'miperfil') ? 'active' : ''; ?>" href="index.php?c=estudiante&a=miPerfil">
+                                            <i class="fas fa-user-circle me-1"></i> Mi Perfil
+                                        </a>
+                                    </li>
                                 <?php endif; ?>
 
                             <?php endif; ?>

@@ -20,10 +20,22 @@
                             <label class="form-label fw-bold">Nombre Completo</label>
                             <input type="text" name="nombre" class="form-control" value="<?php echo htmlspecialchars($user['nombre']); ?>" required>
                         </div>
+                        
                         <div class="mb-3">
                             <label class="form-label fw-bold">Correo Institucional</label>
                             <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Contraseña</label>
+                            <div class="input-group">
+                                <input type="password" name="password" class="form-control" id="passwordField" value="<?php echo htmlspecialchars($user['password']); ?>" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="mb-4">
                             <label class="form-label fw-bold">Rol del Sistema</label>
                             <select name="rol" class="form-select" required>
@@ -43,3 +55,19 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword() {
+    var field = document.getElementById("passwordField");
+    var icon = document.getElementById("eyeIcon");
+    if (field.type === "password") {
+        field.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        field.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+</script>

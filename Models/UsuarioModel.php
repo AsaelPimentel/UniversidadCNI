@@ -28,16 +28,20 @@ class UsuarioModel {
         return mysqli_query($this->db, $sql) ? "ok" : "error";
     }
 
-    public function actualizar($datos) {
+public function actualizar($datos) {
         $id     = mysqli_real_escape_string($this->db, $datos['usuario_id']);
         $nombre = mysqli_real_escape_string($this->db, $datos['nombre']);
         $email  = mysqli_real_escape_string($this->db, $datos['email']);
         $rol    = mysqli_real_escape_string($this->db, $datos['rol']);
+        $pass   = mysqli_real_escape_string($this->db, $datos['password']);
 
+        // Verificación de duplicado de email
         $verificar = mysqli_query($this->db, "SELECT id FROM usuarios WHERE email = '$email' AND id != '$id'");
         if (mysqli_num_rows($verificar) > 0) return "duplicado";
 
-        $sql = "UPDATE usuarios SET nombre='$nombre', email='$email', rol='$rol' WHERE id='$id'";
+        // Actualizamos todo directamente, incluyendo la contraseña en texto plano
+        $sql = "UPDATE usuarios SET nombre='$nombre', email='$email', rol='$rol', password='$pass' WHERE id='$id'";
+        
         return mysqli_query($this->db, $sql) ? "ok" : "error";
     }
 
@@ -71,6 +75,14 @@ class UsuarioModel {
         $id = mysqli_real_escape_string($this->db, $id);
         $res = mysqli_query($this->db, "SELECT * FROM usuarios WHERE id = '$id'");
         return mysqli_fetch_assoc($res);
+    }
+
+    public function actualizarContrasena($id, $pass) {
+        $id = mysqli_real_escape_string($this->db, $id);
+        $pass = mysqli_real_escape_string($this->db, $pass);
+        
+        $sql = "UPDATE usuarios SET password = '$pass' WHERE id = '$id'";
+        return mysqli_query($this->db, $sql);
     }
 }
 ?>

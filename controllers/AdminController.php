@@ -47,22 +47,29 @@ class AdminController
         exit();
     }
 
-    public function editar()
+public function editar()
     {
         $model = new UsuarioModel();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // El modelo ahora recibirá el campo 'password' (si fue enviado)
+            // dentro del arreglo $_POST automáticamente.
             $resultado = $model->actualizar($_POST);
+            
             if ($resultado === "ok") {
                 $_SESSION['alerta'] = ['tipo' => 'success', 'mensaje' => '¡Usuario actualizado correctamente!'];
                 header("Location: index.php?c=admin&a=index");
+            } else if ($resultado === "duplicado") {
+                $_SESSION['alerta'] = ['tipo' => 'warning', 'mensaje' => 'El correo ya está registrado en otro usuario.'];
+                header("Location: index.php?c=admin&a=editar&id=" . $_POST['usuario_id']);
             } else {
-                $_SESSION['alerta'] = ['tipo' => 'danger', 'mensaje' => 'Error o correo duplicado al actualizar.'];
+                $_SESSION['alerta'] = ['tipo' => 'danger', 'mensaje' => 'Error al actualizar el usuario.'];
                 header("Location: index.php?c=admin&a=editar&id=" . $_POST['usuario_id']);
             }
             exit();
         }
 
+        // Si es un GET, cargamos la vista
         $user = $model->obtenerPorId($_GET['id']);
         if (!$user) {
             header("Location: index.php?c=admin&a=index");
