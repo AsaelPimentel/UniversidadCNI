@@ -31,6 +31,11 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Instrucciones / Descripción (Opcional)</label>
+                            <textarea name="instrucciones" class="form-control" rows="3" placeholder="Ej. Por favor, mira el video completo y luego responde el formulario..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Material Digital (Múltiples PDFs)</label>
                             <input type="file" name="pdf_files[]" class="form-control" accept=".pdf" multiple>
                         </div>

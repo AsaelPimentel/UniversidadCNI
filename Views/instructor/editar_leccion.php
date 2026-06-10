@@ -23,6 +23,11 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Instrucciones / Descripción (Opcional)</label>
+                            <textarea name="instrucciones" class="form-control" rows="3"><?php echo htmlspecialchars($leccion['instrucciones'] ?? ''); ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Añadir más Material Digital (Opcional)</label>
                             <input type="file" name="pdf_files[]" class="form-control" accept=".pdf" multiple>
                             <div class="form-text small text-secondary">Si subes archivos nuevos, se sumarán a los que ya tiene esta lección.</div>

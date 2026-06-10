@@ -56,7 +56,7 @@
                         <iframe src="https://www.youtube.com/embed/<?php echo $leccion_actual['contenido_url']; ?>?rel=0" allowfullscreen></iframe>
                     </div>
 
-                    <div class="card-body">
+<div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h4 class="fw-bold mb-0"><?php echo htmlspecialchars($leccion_actual['titulo']); ?></h4>
 
@@ -72,6 +72,20 @@
                                 <span class="badge bg-success fs-6"><i class="fas fa-check-double"></i> Lección Completada</span>
                             <?php endif; ?>
                         </div>
+
+                        <?php if (!empty($leccion_actual['instrucciones'])): ?>
+                            <div class="mt-3 p-3 bg-light rounded border-start border-uabc-green border-4 shadow-sm" style="border-left-color: #065b3e !important;">
+                                <h6 class="fw-bold text-dark mb-2"><i class="fas fa-info-circle text-uabc-green me-1" style="color: #065b3e;"></i> Instrucciones de la lección</h6>
+                                <p class="mb-0 small text-secondary" style="white-space: pre-line;">
+                                    <?php 
+                                        // Esto convierte enlaces de texto (http://...) en links clickeables automáticamente
+                                        $texto = htmlspecialchars($leccion_actual['instrucciones']);
+                                        $texto_con_links = preg_replace('!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1" target="_blank" class="text-primary fw-bold text-decoration-none">$1</a>', $texto);
+                                        echo $texto_con_links;
+                                    ?>
+                                </p>
+                            </div>
+                        <?php endif; ?>
 
                         <?php if (mysqli_num_rows($archivos_leccion) > 0): ?>
                             <hr>
