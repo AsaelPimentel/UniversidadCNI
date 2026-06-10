@@ -17,7 +17,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Enlace de Video (YouTube)</label>
+                            <label class="form-label fw-bold">Enlace de Video</label>
                             <input type="text" name="url" class="form-control" value="<?php echo htmlspecialchars($leccion['contenido_url']); ?>" required>
                             <div class="form-text text-muted small">El sistema extraerá automáticamente el ID del video si pegas el enlace completo.</div>
                         </div>

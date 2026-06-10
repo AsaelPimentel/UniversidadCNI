@@ -34,11 +34,17 @@ public function guardarLeccion($datos, $archivos) {
         // Capturar fecha límite si la tiene, de lo contrario guardar como NULL
         $fecha_limite = !empty($datos['fecha_limite']) ? "'" . mysqli_real_escape_string($this->db, $datos['fecha_limite']) . "'" : "NULL";
 
+        // Formatear URL para que sea incrustable (Embed)
+        $url_final = $url;
         if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
-            $video_id = $match[1];
-        } else { $video_id = $url; }
+            $url_final = "https://www.youtube.com/embed/" . $match[1] . "?rel=0";
+        } elseif (strpos($url, 'drive.google.com') !== false) {
+            $url_final = str_replace('/view', '/preview', $url);
+        }
 
-        $sql = "INSERT INTO lecciones (curso_id, titulo, contenido_url, tiene_tarea, fecha_limite) VALUES ('$curso_id', '$titulo', '$video_id', '$tiene_tarea', $fecha_limite)";
+        $url_escapada = mysqli_real_escape_string($this->db, $url_final);
+
+        $sql = "INSERT INTO lecciones (curso_id, titulo, contenido_url, tiene_tarea, fecha_limite) VALUES ('$curso_id', '$titulo', '$url_escapada', '$tiene_tarea', $fecha_limite)";
         if (mysqli_query($this->db, $sql)) {
             // procesarMultiplesArchivos asume que existe esta función en tu modelo
             if (method_exists($this, 'procesarMultiplesArchivos')) {
@@ -52,7 +58,17 @@ public function guardarLeccion($datos, $archivos) {
 public function actualizarLeccion($datos, $archivos) {
         $id = mysqli_real_escape_string($this->db, $datos['id']);
         $titulo = mysqli_real_escape_string($this->db, $datos['titulo']);
-        $url = mysqli_real_escape_string($this->db, $datos['url']);
+        $url_raw = $datos['url'];
+        $url_final = $url_raw;
+        
+        // Adaptar si se edita con un enlace nuevo de YouTube o Drive
+        if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url_raw, $match)) {
+            $url_final = "https://www.youtube.com/embed/" . $match[1] . "?rel=0";
+        } elseif (strpos($url_raw, 'drive.google.com') !== false) {
+            $url_final = str_replace('/view', '/preview', $url_raw);
+        }
+
+        $url = mysqli_real_escape_string($this->db, $url_final);
         $tiene_tarea = isset($datos['tiene_tarea']) ? 1 : 0;
         
         $fecha_limite = !empty($datos['fecha_limite']) ? "'" . mysqli_real_escape_string($this->db, $datos['fecha_limite']) . "'" : "NULL";

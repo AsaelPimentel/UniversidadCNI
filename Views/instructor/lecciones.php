@@ -26,7 +26,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Enlace de Video (YouTube)</label>
+                            <label class="form-label fw-bold">Enlace de Video (YouTube, Google Drive, etc.)</label>
                             <input type="url" name="url_video" class="form-control" placeholder="https://www.youtube.com/watch?v=..." required>
                         </div>
 

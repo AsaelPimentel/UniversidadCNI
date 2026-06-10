@@ -53,7 +53,7 @@
 
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="ratio ratio-16x9 bg-dark rounded-top">
-                        <iframe src="https://www.youtube.com/embed/<?php echo $leccion_actual['contenido_url']; ?>?rel=0" allowfullscreen></iframe>
+                        <iframe src="<?php echo $leccion_actual['contenido_url']; ?>" allowfullscreen></iframe>
                     </div>
 
                     <div class="card-body">
