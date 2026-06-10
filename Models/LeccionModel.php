@@ -30,33 +30,31 @@ class LeccionModel
         }
     }
 
-    public function guardarLeccion($datos, $archivos)
-    {
+    public function guardarLeccion($datos, $archivos) {
         $curso_id = mysqli_real_escape_string($this->db, $datos['curso_id']);
         $titulo = mysqli_real_escape_string($this->db, $datos['titulo_leccion']);
-        $url = $datos['url_video'];
+        $url = trim($datos['url_video']); // Limpiamos espacios
         $tiene_tarea = isset($datos['tiene_tarea']) ? 1 : 0;
-
-        // Capturar fecha límite si la tiene, de lo contrario guardar como NULL
+        
         $fecha_limite = !empty($datos['fecha_limite']) ? "'" . mysqli_real_escape_string($this->db, $datos['fecha_limite']) . "'" : "NULL";
-
-        // NUEVO: Capturar instrucciones y enlace externo, si están vacíos se guardan como NULL
         $instrucciones = !empty($datos['instrucciones']) ? "'" . mysqli_real_escape_string($this->db, $datos['instrucciones']) . "'" : "NULL";
 
-
-        // Lógica original de extracción de ID de YouTube
-        if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
-            $video_id = $match[1];
+        // LÓGICA DE VIDEO OPCIONAL
+        if (!empty($url)) {
+            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
+                $video_id = "'" . mysqli_real_escape_string($this->db, $match[1]) . "'";
+            } else { 
+                $video_id = "'" . mysqli_real_escape_string($this->db, $url) . "'"; 
+            }
         } else {
-            $video_id = $url;
+            $video_id = "NULL"; // Si no hay url, mandamos nulo a la BD
         }
 
-        // NUEVO: Agregamos instrucciones y enlace_externo al INSERT
+        // Fíjate que a $video_id le quitamos las comillas simples en el VALUES porque ya las trae de arriba
         $sql = "INSERT INTO lecciones (curso_id, titulo, instrucciones, contenido_url, tiene_tarea, fecha_limite) 
-                VALUES ('$curso_id', '$titulo', $instrucciones, '$video_id', '$tiene_tarea', $fecha_limite)";
-
+                VALUES ('$curso_id', '$titulo', $instrucciones, $video_id, '$tiene_tarea', $fecha_limite)";
+        
         if (mysqli_query($this->db, $sql)) {
-            // procesarMultiplesArchivos asume que existe esta función en tu modelo
             if (method_exists($this, 'procesarMultiplesArchivos')) {
                 $this->procesarMultiplesArchivos(mysqli_insert_id($this->db), $archivos);
             }
@@ -65,30 +63,30 @@ class LeccionModel
         return false;
     }
 
-    public function actualizarLeccion($datos, $archivos)
-    {
+    public function actualizarLeccion($datos, $archivos) {
         $id = mysqli_real_escape_string($this->db, $datos['id']);
         $titulo = mysqli_real_escape_string($this->db, $datos['titulo']);
-        $url = mysqli_real_escape_string($this->db, $datos['url']);
+        $url = trim($datos['url']);
         $tiene_tarea = isset($datos['tiene_tarea']) ? 1 : 0;
-
-        $fecha_limite = !empty($datos['fecha_limite']) ? "'" . mysqli_real_escape_string($this->db, $datos['fecha_limite']) . "'" : "NULL";
-
-        // NUEVO: Capturar instrucciones y enlace externo
-        $instrucciones = !empty($datos['instrucciones']) ? "'" . mysqli_real_escape_string($this->db, $datos['instrucciones']) . "'" : "NULL";
         
-        // Lógica original de extracción de ID de YouTube para la actualización
-        if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
-            $video_id = $match[1];
+        $fecha_limite = !empty($datos['fecha_limite']) ? "'" . mysqli_real_escape_string($this->db, $datos['fecha_limite']) . "'" : "NULL";
+        $instrucciones = !empty($datos['instrucciones']) ? "'" . mysqli_real_escape_string($this->db, $datos['instrucciones']) . "'" : "NULL";
+
+        // LÓGICA DE VIDEO OPCIONAL
+        if (!empty($url)) {
+            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
+                $video_id = "'" . mysqli_real_escape_string($this->db, $match[1]) . "'";
+            } else { 
+                $video_id = "'" . mysqli_real_escape_string($this->db, $url) . "'"; 
+            }
         } else {
-            $video_id = $url;
+            $video_id = "NULL";
         }
 
-        // NUEVO: Agregamos instrucciones y enlace_externo al UPDATE
         $sql = "UPDATE lecciones SET 
                 titulo = '$titulo', 
                 instrucciones = $instrucciones,
-                contenido_url = '$video_id', 
+                contenido_url = $video_id, 
                 tiene_tarea = '$tiene_tarea', 
                 fecha_limite = $fecha_limite 
                 WHERE id = '$id'";
