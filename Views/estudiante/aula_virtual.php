@@ -1,4 +1,4 @@
-<div class="container-fluid mt-3 px-4">
+<div class="container-fluid mt-3 px-4" id="zona-foro-dudas">
 
     <div class="mb-3 d-flex justify-content-between align-items-center">
         <h3 class="fw-bold text-uabc-green"><i class="fas fa-laptop-code"></i> <?php echo htmlspecialchars($curso['titulo']); ?></h3>
@@ -52,22 +52,34 @@
             <?php if ($leccion_actual): ?>
 
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="ratio ratio-16x9 bg-dark rounded-top">
-                        <iframe src="https://www.youtube.com/embed/<?php echo $leccion_actual['contenido_url']; ?>?rel=0" allowfullscreen></iframe>
-                    </div>
+                    <?php if (!empty($leccion_actual['contenido_url'])): ?>
+                        <div class="ratio ratio-16x9 bg-dark rounded-top">
+                            <iframe src="https://www.youtube.com/embed/<?php echo $leccion_actual['contenido_url']; ?>?rel=0" allowfullscreen></iframe>
+                        </div>
+                    <?php else: ?>
+                        <div class="bg-dark rounded-top d-flex flex-column align-items-center justify-content-center" style="height: 350px; background: linear-gradient(rgba(6, 91, 62, 0.8), rgba(6, 91, 62, 0.9)), url('assets/Img/FondoCimarron.jpg') center/cover;">
+                            <img src="assets/Img/Logo CNI.png" alt="Logo CNI" style="width: 100px; opacity: 0.8;" class="mb-3">
+                            <h4 class="text-white fw-bold"><i class="fas fa-book-reader"></i> Material de Lectura / Tarea</h4>
+                            <p class="text-light small">Esta lección no contiene video. Por favor lee las instrucciones debajo.</p>
+                        </div>
+                    <?php endif; ?>
 
-<div class="card-body">
+                    <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h4 class="fw-bold mb-0"><?php echo htmlspecialchars($leccion_actual['titulo']); ?></h4>
 
                             <?php if (!$completada): ?>
-                                <form action="index.php?c=estudiante&a=marcarCompletada" method="POST">
-                                    <input type="hidden" name="curso_id" value="<?php echo $curso['id']; ?>">
-                                    <input type="hidden" name="leccion_id" value="<?php echo $leccion_actual['id']; ?>">
-                                    <button type="submit" class="btn btn-success fw-bold shadow-sm">
-                                        <i class="fas fa-check"></i> Marcar como Completada
-                                    </button>
-                                </form>
+                                <?php if ($leccion_actual['tiene_tarea'] == 1): ?>
+                                    <span class="badge bg-warning text-dark fs-6 shadow-sm"><i class="fas fa-clock"></i> Pendiente de validación del instructor</span>
+                                <?php else: ?>
+                                    <form action="index.php?c=estudiante&a=marcarCompletada" method="POST">
+                                        <input type="hidden" name="curso_id" value="<?php echo $curso['id']; ?>">
+                                        <input type="hidden" name="leccion_id" value="<?php echo $leccion_actual['id']; ?>">
+                                        <button type="submit" class="btn btn-success fw-bold shadow-sm">
+                                            <i class="fas fa-check"></i> Marcar como Completada
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <span class="badge bg-success fs-6"><i class="fas fa-check-double"></i> Lección Completada</span>
                             <?php endif; ?>
@@ -77,11 +89,11 @@
                             <div class="mt-3 p-3 bg-light rounded border-start border-uabc-green border-4 shadow-sm" style="border-left-color: #065b3e !important;">
                                 <h6 class="fw-bold text-dark mb-2"><i class="fas fa-info-circle text-uabc-green me-1" style="color: #065b3e;"></i> Instrucciones de la lección</h6>
                                 <p class="mb-0 small text-secondary" style="white-space: pre-line;">
-                                    <?php 
-                                        // Esto convierte enlaces de texto (http://...) en links clickeables automáticamente
-                                        $texto = htmlspecialchars($leccion_actual['instrucciones']);
-                                        $texto_con_links = preg_replace('!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1" target="_blank" class="text-primary fw-bold text-decoration-none">$1</a>', $texto);
-                                        echo $texto_con_links;
+                                    <?php
+                                    // Esto convierte enlaces de texto (http://...) en links clickeables automáticamente
+                                    $texto = htmlspecialchars($leccion_actual['instrucciones']);
+                                    $texto_con_links = preg_replace('!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1" target="_blank" class="text-primary fw-bold text-decoration-none">$1</a>', $texto);
+                                    echo $texto_con_links;
                                     ?>
                                 </p>
                             </div>
@@ -139,7 +151,7 @@
                                             </a>
                                         </div>
 
-                                        <div class="mt-3 text-start">
+                                        <div id="zona-comentarios-tarea" class="mt-3 text-start">
                                             <h6 class="fw-bold text-dark small"><i class="fas fa-lock text-warning"></i> Comentarios Privados (Instructor)</h6>
                                             <div class="bg-white border rounded p-2 mb-2" style="max-height: 200px; overflow-y: auto;">
                                                 <?php if (!empty($comentarios_tarea)): ?>
@@ -189,7 +201,7 @@
                         </div>
                     <?php endif; ?>
 
-                    <div class="col-md-<?php echo $leccion_actual['tiene_tarea'] ? '6' : '12'; ?> mb-4">
+                    <div class="col-md-<?php echo $leccion_actual['tiene_tarea'] ? '6' : '12'; ?> mb-4" id="zona-foro-dudas">
                         <div class="card shadow-sm h-100 border-0">
                             <div class="card-header bg-light fw-bold">
                                 <i class="fas fa-comments"></i> Foro de Dudas

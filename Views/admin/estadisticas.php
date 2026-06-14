@@ -16,7 +16,7 @@
         border-radius: 10px;
         display: flex;
         align-items: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 2px 4px rgba(67, 43, 43, 0.02);
         transition: all 0.3s ease;
         cursor: pointer;
     }
@@ -39,6 +39,50 @@
     .custom-option:checked { background-color: #065b3e !important; color: #ffffff !important; font-weight: 700; }
 </style>
 
+<div class="container mt-4">
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="card-header bg-light fw-bold py-3">
+        <i class="fas fa-file-export text-danger me-2"></i> Centro de Exportación de Reportes
+    </div>
+    <div class="card-body">
+        <form action="index.php" method="GET" target="_blank" class="row g-3 align-items-end">
+            <input type="hidden" name="c" value="admin">
+            <input type="hidden" name="a" value="generarReporteEstadisticas">
+            
+            <input type="hidden" name="rango_filtro" value="<?php echo htmlspecialchars($rango ?? '7d'); ?>">
+
+            <div class="col-md-5">
+                <label class="form-label small fw-bold text-secondary mb-1"><i class="fas fa-list"></i> Selecciona el Tipo de Reporte:</label>
+                <select name="tipo_reporte" class="form-select form-select-sm fw-medium" required>
+                    <option value="general">1. Reporte General (Todo el Dashboard)</option>
+                    <option value="nuevos_usuarios">2. Reporte Detallado de Nuevos Usuarios</option>
+                    <option value="actividad_interaccion">3. Reporte de Actividad e Interacción</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-secondary mb-1"><i class="fas fa-sliders-h"></i> Ámbito Temporal:</label>
+                <select name="modo_ambito" class="form-select form-select-sm fw-medium" required>
+                    <option value="historico">Histórico Completo (Todo el tiempo)</option>
+                    <option value="filtrado">Aplicar Filtro Activo (<?php 
+                        if (($rango ?? '7d') == '7d') echo "Últimos 7 Días";
+                        elseif ($rango == '1m') echo "Último Mes";
+                        elseif ($rango == '6m') echo "Últimos 6 Meses";
+                        elseif ($rango == '1y') echo "Último Año";
+                    ?>)</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-danger btn-sm w-100 fw-bold shadow-sm py-2">
+                    <i class="fas fa-file-pdf me-1"></i> Generar Documento PDF
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
 <div class="container mt-4 mb-5">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -58,6 +102,7 @@
             </div>
         </form>
     </div>
+
 
     <div class="row">
         <div class="col-md-4 mb-4">

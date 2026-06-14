@@ -64,7 +64,6 @@ class TareaModel
         $ejecutado = mysqli_query($this->db, $sql);
 
         if ($ejecutado) {
-            // BUSCAR AL ALUMNO DE LA TAREA para notificarle
             $sql_alumno = "SELECT t.usuario_id, l.curso_id, l.id as leccion_id 
                            FROM tareas_entregadas t
                            JOIN lecciones l ON t.leccion_id = l.id 
@@ -72,9 +71,9 @@ class TareaModel
             $res = mysqli_fetch_assoc(mysqli_query($this->db, $sql_alumno));
 
             if ($res) {
-                // Crear la notificación para el alumno
                 $notif = new NotificacionModel();
-                $notif->crearNotificacion($res['usuario_id'], "El instructor ha dejado un comentario en tu tarea.", $res['leccion_id'], $res['curso_id']);
+                // AQUÍ AGREGAMOS EL ANCLA AL FINAL: "#zona-comentarios-tarea"
+                $notif->crearNotificacion($res['usuario_id'], "El instructor ha dejado un comentario en tu tarea.", $res['leccion_id'], $res['curso_id'], "#zona-comentarios-tarea");
             }
         }
 
@@ -86,5 +85,14 @@ class TareaModel
         $tarea = mysqli_real_escape_string($this->db, $tarea_id);
         $sql = "SELECT ct.*, u.nombre, u.rol FROM comentarios_tarea ct INNER JOIN usuarios u ON ct.usuario_id = u.id WHERE ct.tarea_id = '$tarea' ORDER BY ct.fecha ASC";
         return mysqli_query($this->db, $sql);
+    }
+
+public function obtenerTareaPorId($id)
+    {
+        $id = mysqli_real_escape_string($this->db, $id);
+        $query = "SELECT * FROM tareas_entregadas WHERE id = '$id'";
+        $resultado = mysqli_query($this->db, $query);
+        
+        return mysqli_fetch_assoc($resultado);
     }
 }

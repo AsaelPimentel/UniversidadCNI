@@ -81,33 +81,108 @@ class EstudianteController
         }
     }
 
-    public function subirTarea()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $modelTarea = new TareaModel();
-            $modelLeccion = new LeccionModel();
+public function subirTarea()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $modelTarea = new TareaModel();
+        $modelLeccion = new LeccionModel();
+        $modelCurso = new CursoModel();       // <-- NUEVO: Para buscar los datos del curso
+        $modelUsuario = new UsuarioModel();   // <-- NUEVO: Para buscar el correo del maestro
 
-            // 1. Obtenemos los datos de la lección para saber la fecha límite
-            $leccion = $modelLeccion->obtenerLeccionPorId($_POST['leccion_id']);
-            $estatus = "A tiempo"; // Estatus por defecto
+        // 1. Calcular estatus de entrega según la fecha límite
+        $leccion = $modelLeccion->obtenerLeccionPorId($_POST['leccion_id']);
+        $estatus = "A tiempo";
 
-            // 2. Verificamos si existe fecha límite y comparamos
-            if (!empty($leccion['fecha_limite'])) {
-                $fecha_actual = new DateTime(); // Hora exacta en que sube el archivo
-                $fecha_limite = new DateTime($leccion['fecha_limite']);
-
-                if ($fecha_actual > $fecha_limite) {
-                    $estatus = "Entregada con retraso";
-                }
+        if (!empty($leccion['fecha_limite'])) {
+            $fecha_actual = new DateTime();
+            $fecha_limite = new DateTime($leccion['fecha_limite']);
+            if ($fecha_actual > $fecha_limite) {
+                $estatus = "Entregada con retraso";
             }
-
-            // 3. Guardamos la tarea pasando el estatus calculado
-            $modelTarea->guardarTarea($_POST['leccion_id'], $_SESSION['usuario_id'], $_FILES['archivo_tarea'], $estatus);
-
-            header("Location: index.php?c=estudiante&a=verCurso&id=" . $_POST['curso_id'] . "&lec_id=" . $_POST['leccion_id'] . "&msj=tarea_ok");
-            exit();
         }
+
+        // 2. Guardar la tarea físicamente y en la Base de Datos
+        $modelTarea->guardarTarea($_POST['leccion_id'], $_SESSION['usuario_id'], $_FILES['archivo_tarea'], $estatus);
+
+        // --- 3. LOGICA DINÁMICA DE OBTENCIÓN DE CORREOS DESDE LA BD ---
+        // Obtener el ID del instructor a través del curso actual
+        $curso = $modelCurso->obtenerCursoPorId($_POST['curso_id']);
+        $instructor_id = $curso['instructor_id'];
+
+        // Consultar los datos del instructor en la tabla usuarios
+        $instructor = $modelUsuario->obtenerPorId($instructor_id);
+        
+        // Asignación de variables con datos reales de la Base de Datos y Sesión
+        $instructor_email = $instructor['email']; // Correo del maestro guardado en la BD
+        $instructor_nombre = $instructor['nombre'];
+        $alumno_email = $_SESSION['email'];       // Correo del alumno desde la sesión activa
+        $alumno_nombre = $_SESSION['nombre'];
+        $materia_nombre = $curso['titulo'];
+        $leccion_nombre = $leccion['titulo'];
+
+        // --- 4. CONFIGURACIÓN Y ENVÍO CON PHPMAILER ---
+        require_once __DIR__ . '/../Config/MailConfig.php'; 
+        require_once __DIR__ . '/../Assets/PHPMailer/src/Exception.php';
+        require_once __DIR__ . '/../Assets/PHPMailer/src/PHPMailer.php';
+        require_once __DIR__ . '/../Assets/PHPMailer/src/SMTP.php';
+
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+        try {
+            // Configuración del servidor (La cuenta de la Universidad CNI)
+            $mail->isSMTP();
+            $mail->Host       = MailConfig::$host;
+            $mail->SMTPAuth   = MailConfig::$smtp_auth;
+            $mail->Username   = MailConfig::$username; // El correo del sistema
+            $mail->Password   = MailConfig::$password; // La clave del sistema
+            $mail->SMTPSecure = (MailConfig::$secure === 'ssl') ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = MailConfig::$port;
+            $mail->CharSet    = 'UTF-8';
+
+            // 1. EL REMITENTE SIEMPRE ES EL SISTEMA
+            $mail->setFrom(MailConfig::$username, "Plataforma Universidad CNI");
+
+            // --------------------------------------------------------
+            // DESTINATARIO: El Instructor
+            // --------------------------------------------------------
+            $mail->addAddress($instructor_email, $instructor_nombre);
+            
+            // 2. EL TRUCO: Si el maestro le da a "Responder", el correo se dirigirá al alumno
+            $mail->addReplyTo($alumno_email, $alumno_nombre);
+
+            $mail->isHTML(true);
+            $mail->Subject = "Nueva tarea recibida - $materia_nombre (Enviado por: $alumno_nombre)";
+            
+            // 3. En el cuerpo del correo aclaramos de quién viene la tarea
+            $mail->Body = "
+                <div style='font-family: Arial, sans-serif; color: #333;'>
+                    <h3 style='color: #065b3e;'>Nueva Evidencia por Revisar</h3>
+                    <p>Estimado instructor <strong>$instructor_nombre</strong>,</p>
+                    <p>El sistema te notifica que el alumno <strong>$alumno_nombre</strong> (<em>$alumno_email</em>) ha entregado su evidencia.</p>
+                    <ul>
+                        <li><strong>Curso:</strong> $materia_nombre</li>
+                        <li><strong>Lección:</strong> $leccion_nombre</li>
+                        <li><strong>Estatus del envío:</strong> $estatus</li>
+                    </ul>
+                    <p>Por favor, ingresa al panel de administración para calificar la entrega.</p>
+                    <hr>
+                    <p style='font-size: 12px; color: #777;'>
+                        <em>Nota: Puedes responder directamente a este correo; tu respuesta será enviada automáticamente al alumno.</em>
+                    </p>
+                </div>
+            ";
+            
+            $mail->send();
+
+        } catch (Exception $e) {
+            // Captura silenciosa de errores 
+        }
+
+        // 5. Redireccionar al aula virtual con mensaje de éxito
+        header("Location: index.php?c=estudiante&a=verCurso&id=" . $_POST['curso_id'] . "&lec_id=" . $_POST['leccion_id'] . "&msj=tarea_ok");
+        exit();
     }
+}
 
     public function comentar()
     {

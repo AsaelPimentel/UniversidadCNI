@@ -84,5 +84,6 @@ public function actualizar($datos) {
         $sql = "UPDATE usuarios SET password = '$pass' WHERE id = '$id'";
         return mysqli_query($this->db, $sql);
     }
+    
 }
 ?>

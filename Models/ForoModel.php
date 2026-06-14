@@ -10,7 +10,7 @@ class ForoModel
         $this->db = ConexionDB::obtenerConexion();
     }
 
-    public function guardarComentario($leccion_id, $usuario_id, $texto)
+public function guardarComentario($leccion_id, $usuario_id, $texto)
     {
         $leccion = mysqli_real_escape_string($this->db, $leccion_id);
         $usuario = mysqli_real_escape_string($this->db, $usuario_id);
@@ -20,16 +20,29 @@ class ForoModel
         $ejecutado = mysqli_query($this->db, $sql);
 
         if ($ejecutado) {
-            // BUSCAR QUIÉN ES EL INSTRUCTOR DE ESTA LECCIÓN para notificarle
-            $sql_instructor = "SELECT c.instructor_id, c.id as curso_id FROM cursos c 
-                               JOIN lecciones l ON c.id = l.curso_id WHERE l.id = '$leccion'";
-            $res = mysqli_fetch_assoc(mysqli_query($this->db, $sql_instructor));
+            // Obtenemos información del curso y de quien comenta
+            $sql_info = "SELECT c.instructor_id, c.id as curso_id, u.rol 
+                         FROM cursos c 
+                         JOIN lecciones l ON c.id = l.curso_id 
+                         JOIN usuarios u ON u.id = '$usuario'
+                         WHERE l.id = '$leccion'";
+            $info = mysqli_fetch_assoc(mysqli_query($this->db, $sql_info));
 
-            // Crear la notificación
             $notif = new NotificacionModel();
-            $notif->crearNotificacion($res['instructor_id'], "Nuevo comentario en lección: " . $leccion, $leccion, $res['curso_id']);
-        }
 
+            if ($info['rol'] == 'estudiante') {
+                // Si el alumno comenta, se notifica al instructor
+                $notif->crearNotificacion($info['instructor_id'], "Nuevo comentario en el foro de dudas.", $leccion, $info['curso_id'], "#zona-foro-dudas");
+            } else {
+                // Si el instructor responde, se notifica a los estudiantes que han participado en esta lección
+                $sql_est = "SELECT DISTINCT usuario_id FROM comentarios WHERE leccion_id = '$leccion' AND usuario_id != '$usuario'";
+                $res_est = mysqli_query($this->db, $sql_est);
+                
+                while ($est = mysqli_fetch_assoc($res_est)) {
+                    $notif->crearNotificacion($est['usuario_id'], "El instructor respondió tu duda en el foro.", $leccion, $info['curso_id'], "#zona-foro-dudas");
+                }
+            }
+        }
         return $ejecutado;
     }
 

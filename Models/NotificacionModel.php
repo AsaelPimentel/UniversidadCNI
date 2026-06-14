@@ -7,13 +7,14 @@ class NotificacionModel {
         $this->db = ConexionDB::obtenerConexion();
     }
 
-    public function crearNotificacion($usuario_id, $mensaje, $leccion_id, $curso_id) {
+public function crearNotificacion($usuario_id, $mensaje, $leccion_id, $curso_id, $ancla = '') {
         $u = mysqli_real_escape_string($this->db, $usuario_id);
         $m = mysqli_real_escape_string($this->db, $mensaje);
         $l = mysqli_real_escape_string($this->db, $leccion_id);
         $c = mysqli_real_escape_string($this->db, $curso_id);
+        $a = mysqli_real_escape_string($this->db, $ancla);
 
-        $sql = "INSERT INTO notificaciones (usuario_id, mensaje, leccion_id, curso_id) VALUES ('$u', '$m', '$l', '$c')";
+        $sql = "INSERT INTO notificaciones (usuario_id, mensaje, leccion_id, curso_id, ancla) VALUES ('$u', '$m', '$l', '$c', '$a')";
         return mysqli_query($this->db, $sql);
     }
 

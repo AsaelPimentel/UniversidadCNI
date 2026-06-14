@@ -1,4 +1,11 @@
-<div class="container mt-4">
+<?php
+// Ensure $curso_seleccionado is defined to avoid undefined variable notices
+if (!isset($curso_seleccionado) || $curso_seleccionado === null) {
+    $curso_seleccionado = 'todos';
+}
+?>
+
+<div class="container mt-4" id="zona-tareas-maestro">
     <h2 class="mb-4 text-uabc-green fw-bold"><i class="fas fa-tasks"></i> Revisión de Evidencias</h2>
 
     <?php if (isset($_GET['msj']) && $_GET['msj'] == 'feedback_ok'): ?>
@@ -18,11 +25,13 @@
                     <label class="form-label small fw-bold text-secondary mb-1">Filtrar por Curso:</label>
                     <select name="curso_filter" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="todos" <?php echo ($curso_seleccionado == 'todos') ? 'selected' : ''; ?>>--- Todos mis cursos creados ---</option>
-                        <?php while ($c = mysqli_fetch_assoc($query_cursos)): ?>
-                            <option value="<?php echo $c['id']; ?>" <?php echo ($curso_seleccionado == $c['id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($c['titulo']); ?>
-                            </option>
-                        <?php endwhile; ?>
+                        <?php if (isset($query_cursos) && $query_cursos): ?>
+                            <?php while ($c = mysqli_fetch_assoc($query_cursos)): ?>
+                                <option value="<?php echo $c['id']; ?>" <?php echo ($curso_seleccionado == $c['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($c['titulo']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        <?php endif; ?>
                     </select>
                 </div>
             </form>
@@ -131,11 +140,19 @@
                         <?php endif; ?>
                     </div>
 
-                    <form action="index.php?c=instructor&a=enviarFeedback" method="POST">
+<form action="index.php?c=instructor&a=enviarFeedback" method="POST">
                         <input type="hidden" name="tarea_id" value="<?php echo $tarea['tarea_id']; ?>">
                         <input type="hidden" name="curso_filter" value="<?php echo htmlspecialchars($curso_seleccionado); ?>">
+                        
+                        <div class="form-check mb-3 mt-2 text-start ms-1 bg-light p-2 rounded border border-success">
+                            <input class="form-check-input ms-1" type="checkbox" name="marcar_completada" value="1" id="checkAprobar<?php echo $tarea['tarea_id']; ?>">
+                            <label class="form-check-label small fw-bold text-success ms-2" for="checkAprobar<?php echo $tarea['tarea_id']; ?>" style="cursor: pointer;">
+                                <i class="fas fa-check-circle"></i> Aprobar evidencia y marcar lección como completada al alumno
+                            </label>
+                        </div>
+
                         <div class="input-group">
-                            <input type="text" name="comentario" class="form-control" placeholder="Escribe un comentario o retroalimentación..." required>
+                            <input type="text" name="comentario" class="form-control" placeholder="Escribe un comentario (Opcional si apruebas)...">
                             <button class="btn btn-warning fw-bold text-dark" type="submit"><i class="fas fa-paper-plane"></i></button>
                         </div>
                     </form>

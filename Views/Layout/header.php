@@ -62,7 +62,7 @@ $current_a = isset($_GET['a']) ? strtolower(trim($_GET['a'])) : 'login';
                 <div class="container">
                     <a class="navbar-brand fw-bold d-flex align-items-center" href="index.php">
                         <img src="assets/Img/Logo CNI.png" alt="Logo CNI" style="width: 45px; margin-right: 10px;">
-                        <span>Universidad CNI</span>
+                        <span>UNIVERSIDAD CNI</span>
                     </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPrincipal">
@@ -128,41 +128,55 @@ $current_a = isset($_GET['a']) ? strtolower(trim($_GET['a'])) : 'login';
                             <?php endif; ?>
                         </ul>
 
-                        <?php if (isset($_SESSION['usuario_id'])):
-                            require_once __DIR__ . '/../../Models/NotificacionModel.php';
-                            $notifModel = new NotificacionModel();
-                            $notificaciones = $notifModel->obtenerNoLeidas($_SESSION['usuario_id']);
-                            $total = mysqli_num_rows($notificaciones);
-                        ?>
-                            <div class="dropdown me-3">
-                                <a class="nav-link text-white position-relative" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-bell"></i>
-                                    <?php if ($total > 0): ?>
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            <?php echo $total; ?>
-                                        </span>
-                                    <?php endif; ?>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 300px;">
-                                    <li class="dropdown-header fw-bold">Notificaciones</li>
-                                    <?php if ($total > 0): ?>
-                                        <?php while ($n = mysqli_fetch_assoc($notificaciones)): ?>
-                                            <li>
-                                                <a class="dropdown-item text-wrap small" href="index.php?c=estudiante&a=verCurso&id=<?php echo $n['curso_id']; ?>&lec_id=<?php echo $n['leccion_id']; ?>">
-                                                    <?php echo $n['mensaje']; ?>
-                                                </a>
-                                            </li>
-                                        <?php endwhile; ?>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item text-center small text-primary" href="index.php?c=auth&a=marcarLeidas">Marcar todas como leídas</a></li>
-                                    <?php else: ?>
-                                        <li><span class="dropdown-item text-muted small">No hay notificaciones nuevas.</span></li>
-                                    <?php endif; ?>
-                                </ul>
-                            </div>
-                        <?php endif; ?>
+                       <?php if (isset($_SESSION['usuario_id'])):
+    require_once __DIR__ . '/../../Models/NotificacionModel.php';
+    $notifModel = new NotificacionModel();
+    $notificaciones = $notifModel->obtenerNoLeidas($_SESSION['usuario_id']);
+    $total = mysqli_num_rows($notificaciones);
+?>
+    <div class="dropdown me-3">
+        <a class="nav-link text-white position-relative" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-bell"></i>
+            <?php if ($total > 0): ?>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <?php echo $total; ?>
+                </span>
+            <?php endif; ?>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 300px;">
+            <li class="dropdown-header fw-bold">Notificaciones</li>
+            <?php if ($total > 0): ?>
+                <?php while ($n = mysqli_fetch_assoc($notificaciones)): 
+                    // --- DETECTAR RUTA SEGÚN EL ROL DEL USUARIO LOGUEADO ---
+                    if (isset($_SESSION['rol']) && ($_SESSION['rol'] === 'instructor' || $_SESSION['rol'] === 'admin')) {
+                        // Si la notificación es del foro, lo manda al foro del maestro
+                        if (strpos($n['ancla'], 'foro') !== false || strpos($n['mensaje'], 'foro') !== false) {
+                            $url_notif = "index.php?c=instructor&a=foro" . ($n['ancla'] ?? '');
+                        } else {
+                            // Si es de tareas, lo manda a revisar tareas aplicando el filtro del curso
+                            $url_notif = "index.php?c=instructor&a=verTareas&curso_filter=" . $n['curso_id'] . ($n['ancla'] ?? '');
+                        }
+                    } else {
+                        // Si es estudiante, mantiene su ruta original al aula virtual
+                        $url_notif = "index.php?c=estudiante&a=verCurso&id=" . $n['curso_id'] . "&lec_id=" . $n['leccion_id'] . ($n['ancla'] ?? '');
+                    }
+                ?>
+                    <li>
+                        <a class="dropdown-item text-wrap small" href="<?php echo $url_notif; ?>">
+                            <?php echo $n['mensaje']; ?>
+                        </a>
+                    </li>
+                <?php endwhile; ?>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item text-center small text-primary" href="index.php?c=auth&a=marcarLeidas">Marcar todas como leídas</a></li>
+            <?php else: ?>
+                <li><span class="dropdown-item text-muted small">No hay notificaciones nuevas.</span></li>
+            <?php endif; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 
                         <?php if (isset($_SESSION['usuario_id'])): ?>
                             <div class="d-flex align-items-center">

@@ -64,5 +64,38 @@ class CursoModel {
         $res = mysqli_query($this->db, "SELECT * FROM cursos WHERE id = '$id'");
         return mysqli_fetch_assoc($res);
     }
+
+    public function actualizarCurso($datos, $archivos)
+    {
+        $id = mysqli_real_escape_string($this->db, $datos['id']);
+        $titulo = mysqli_real_escape_string($this->db, $datos['titulo']);
+        $descripcion = mysqli_real_escape_string($this->db, $datos['descripcion']);
+
+        // Verificar si se subió una nueva imagen con el input "imagen_curso"
+        if (isset($archivos['imagen_curso']) && $archivos['imagen_curso']['error'] == 0) {
+            
+            // Validar y crear la carpeta de Caratulas si no existe
+            if (!is_dir('Assets/Caratulas/')) {
+                mkdir('Assets/Caratulas/', 0777, true);
+            }
+
+            $extension = pathinfo($archivos['imagen_curso']['name'], PATHINFO_EXTENSION);
+            $nombre_archivo = "curso_" . time() . "." . $extension;
+            $ruta_destino = "Assets/Caratulas/" . $nombre_archivo;
+
+            if (move_uploaded_file($archivos['imagen_curso']['tmp_name'], $ruta_destino)) {
+                // Si subió bien la imagen, actualiza todo
+                $query = "UPDATE cursos SET titulo = '$titulo', descripcion = '$descripcion', imagen = '$ruta_destino' WHERE id = '$id'";
+            } else {
+                // Si falló la subida, actualiza solo el texto
+                $query = "UPDATE cursos SET titulo = '$titulo', descripcion = '$descripcion' WHERE id = '$id'";
+            }
+        } else {
+            // Si no envió imagen nueva, actualiza solo el texto
+            $query = "UPDATE cursos SET titulo = '$titulo', descripcion = '$descripcion' WHERE id = '$id'";
+        }
+
+        return mysqli_query($this->db, $query);
+    }
 }
 ?>
