@@ -23,15 +23,20 @@
                                 <i class="far fa-calendar-alt"></i> Creado el: <?php echo date('d/m/Y', strtotime($curso['fecha_creacion'])); ?>
                             </span>
                             
-                            <div class="row g-1 pt-2 border-top">
-                                <div class="col-6">
-                                    <a href="index.php?c=instructor&a=nuevaLeccion&curso_id=<?php echo $curso['id']; ?>" class="btn btn-uabc-green text-white btn-sm w-100 py-2" style="background-color: #065b3e;">
+<div class="row g-1 pt-2 border-top">
+                                <div class="col-5">
+                                    <a href="index.php?c=instructor&a=nuevaLeccion&curso_id=<?php echo $curso['id']; ?>" class="btn btn-uabc-green text-white btn-sm w-100 py-2" style="background-color: #065b3e;" title="Gestionar Lecciones">
                                         <i class="fas fa-video"></i> Lecciones
                                     </a>
                                 </div>
-                                <div class="col-6">
-                                    <a href="index.php?c=instructor&a=rendimiento&curso_id=<?php echo $curso['id']; ?>" class="btn btn-outline-secondary btn-sm w-100 py-2">
-                                        <i class="fas fa-chart-pie"></i> Métricas
+                                <div class="col-4">
+                                    <a href="index.php?c=instructor&a=rendimiento&curso_id=<?php echo $curso['id']; ?>" class="btn btn-outline-secondary btn-sm w-100 py-2" title="Métricas del Curso">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </a>
+                                </div>
+                                <div class="col-3">
+                                    <a href="index.php?c=instructor&a=editarCurso&id=<?php echo $curso['id']; ?>" class="btn btn-outline-primary btn-sm w-100 py-2" title="Editar Curso">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                 </div>
                             </div>
