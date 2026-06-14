@@ -45,40 +45,38 @@
         <i class="fas fa-file-export text-danger me-2"></i> Centro de Exportación de Reportes
     </div>
     <div class="card-body">
-        <form action="index.php" method="GET" target="_blank" class="row g-3 align-items-end">
-            <input type="hidden" name="c" value="admin">
-            <input type="hidden" name="a" value="generarReporteEstadisticas">
-            
-            <input type="hidden" name="rango_filtro" value="<?php echo htmlspecialchars($rango ?? '7d'); ?>">
+<form action="index.php" method="GET" target="_blank" class="row g-3 align-items-end">
+    <input type="hidden" name="c" value="admin">
+    <input type="hidden" name="a" value="generarReporteEstadisticas">
 
-            <div class="col-md-5">
-                <label class="form-label small fw-bold text-secondary mb-1"><i class="fas fa-list"></i> Selecciona el Tipo de Reporte:</label>
-                <select name="tipo_reporte" class="form-select form-select-sm fw-medium" required>
-                    <option value="general">1. Reporte General (Todo el Dashboard)</option>
-                    <option value="nuevos_usuarios">2. Reporte Detallado de Nuevos Usuarios</option>
-                    <option value="actividad_interaccion">3. Reporte de Actividad e Interacción</option>
-                </select>
-            </div>
+    <div class="col-md-5">
+        <label class="form-label small fw-bold text-secondary mb-1"><i class="fas fa-list"></i> Selecciona el Tipo de Reporte:</label>
+        <select name="tipo_reporte" class="form-select form-select-sm fw-medium" required>
+            <option value="general">1. Reporte General (Todo el Dashboard)</option>
+            <option value="nuevos_usuarios">2. Reporte Detallado de Nuevos Usuarios</option>
+            <option value="actividad_interaccion">3. Reporte de Actividad e Interacción</option>
+            <option value="cursos_creados">4. Reporte de Cursos Creados y Fechas</option>
+            <option value="certificados_emitidos">5. Reporte de Certificados Acreditados</option>
+        </select>
+    </div>
 
-            <div class="col-md-4">
-                <label class="form-label small fw-bold text-secondary mb-1"><i class="fas fa-sliders-h"></i> Ámbito Temporal:</label>
-                <select name="modo_ambito" class="form-select form-select-sm fw-medium" required>
-                    <option value="historico">Histórico Completo (Todo el tiempo)</option>
-                    <option value="filtrado">Aplicar Filtro Activo (<?php 
-                        if (($rango ?? '7d') == '7d') echo "Últimos 7 Días";
-                        elseif ($rango == '1m') echo "Último Mes";
-                        elseif ($rango == '6m') echo "Últimos 6 Meses";
-                        elseif ($rango == '1y') echo "Último Año";
-                    ?>)</option>
-                </select>
-            </div>
+    <div class="col-md-4">
+        <label class="form-label small fw-bold text-secondary mb-1"><i class="fas fa-sliders-h"></i> Rango del Reporte:</label>
+        <select name="rango_filtro" class="form-select form-select-sm fw-medium" required>
+            <option value="historico">Histórico Completo (Sin filtro)</option>
+            <option value="7d">Últimos 7 Días</option>
+            <option value="1m">Último Mes</option>
+            <option value="6m">Últimos 6 Meses</option>
+            <option value="1y">Último Año</option>
+        </select>
+    </div>
 
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-danger btn-sm w-100 fw-bold shadow-sm py-2">
-                    <i class="fas fa-file-pdf me-1"></i> Generar Documento PDF
-                </button>
-            </div>
-        </form>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-danger btn-sm w-100 fw-bold shadow-sm py-2">
+            <i class="fas fa-file-pdf me-1"></i> Generar PDF
+        </button>
+    </div>
+</form>
     </div>
 </div>
 </div>
