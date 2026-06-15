@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-05-2026 a las 05:28:08
+-- Tiempo de generación: 15-06-2026 a las 02:08:09
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -87,6 +87,7 @@ CREATE TABLE `lecciones` (
   `id` int(11) NOT NULL,
   `curso_id` int(11) DEFAULT NULL,
   `titulo` varchar(150) NOT NULL,
+  `instrucciones` text DEFAULT NULL,
   `contenido_url` varchar(255) DEFAULT NULL,
   `pdf_ruta` varchar(255) DEFAULT NULL,
   `tiene_tarea` tinyint(1) DEFAULT 0,
@@ -106,7 +107,8 @@ CREATE TABLE `notificaciones` (
   `leccion_id` int(11) NOT NULL,
   `curso_id` int(11) NOT NULL,
   `leida` tinyint(1) DEFAULT 0,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
+  `ancla` varchar(50) DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -158,7 +160,9 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol`, `fecha_registro`) VALUES
-(1, 'Jose Adrian Mejia Reyes', 'Adrian@cni.edu.mx', '123', 'admin', '2026-05-24 16:56:57');
+(1, 'Jose Adrian Mejia Reyes', 'Adrian@cni.edu.mx', '123', 'admin', '2026-05-24 16:56:57'),
+(2, 'Jose Adrian Mejia Maestro', 'Adrian1@cni.edu.mx', '123', 'instructor', '2026-06-10 02:02:24'),
+(3, 'Jose Adrian Mejia Estudiante', 'Adrian2@cni.edu.mx', '123', 'estudiante', '2026-06-10 02:02:45');
 
 --
 -- Índices para tablas volcadas
@@ -275,7 +279,7 @@ ALTER TABLE `tareas_entregadas`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas
